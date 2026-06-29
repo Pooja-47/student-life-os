@@ -4,9 +4,18 @@ This module contains the CoordinatorAgent class, which acts as the central route
 directing user prompts to the correct specialized sub-agent.
 """
 
+from study_planner import create_study_plan
+
 
 class CoordinatorAgent:
     """An agent that routes user queries to specialized sub-agents."""
+
+    ROUTING_RULES = {
+        "study_planner": ["study", "plan"],
+        "research_agent": ["research", "search"],
+        "memory_agent": ["save", "remember"],
+    }
+
 
     def __init__(self) -> None:
         """Initializes the Coordinator Agent with its name."""
@@ -25,30 +34,31 @@ class CoordinatorAgent:
             The string identifier of the target agent (e.g., 'study_planner',
             'research_agent', 'memory_agent') or 'unknown'.
         """
+
+        if not user_input or not isinstance(user_input, str):
+            return "unknown"
+
         # Create a new variable for the cleaned input to avoid mutating parameters
         clean_input = user_input.lower()
 
-        # Define keyword mappings to separate routing data from execution logic
-        routing_rules = {
-            "study_planner": ["study", "plan"],
-            "research_agent": ["research", "search"],
-            "memory_agent": ["save", "remember"],
-        }
-
         # Check keywords for each agent
-        for agent_id, keywords in routing_rules.items():
+        for agent_id, keywords in self.ROUTING_RULES.items():
             if any(keyword in clean_input for keyword in keywords):
+                if agent_id == "study_planner":
+                    return create_study_plan(user_input)
+
                 return agent_id
-
         return "unknown"
-
 
 if __name__ == "__main__":
     # Instantiate the agent and demonstrate routing behavior
     agent = CoordinatorAgent()
 
     # The expected output is shown next to each print statement for clarity
-    print(agent.route_request("help me plan my study"))  # Expected: study_planner
+    print(agent.route_request("Help me plan my study for the AI Capstone Project"))  # Expected: Formatted study plan
     print(agent.route_request("research AI agents"))    # Expected: research_agent
     print(agent.route_request("save my notes"))          # Expected: memory_agent
-    print(agent.route_request("What is the weather today?"))  # Expected: unknown
+    print(agent.route_request("What is the weather today?"))   # Expected: unknown
+
+    
+    
