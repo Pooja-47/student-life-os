@@ -5,6 +5,7 @@ directing user prompts to the correct specialized sub-agent.
 """
 from typing import Union
 
+from agents.memory_agent import MemoryAgent
 from agents.research_agent import ResearchAgent
 from agents.study_planner import StudyPlannerAgent
 
@@ -23,6 +24,7 @@ class CoordinatorAgent:
         self.name: str = "Coordinator Agent"
         self.research_agent = ResearchAgent()
         self.study_planner = StudyPlannerAgent()
+        self.memory_agent = MemoryAgent()
 
     def route_request(self, user_input: str) -> Union[str, dict]:
         """Routes the user's input to the correct specialized agent.
@@ -38,8 +40,11 @@ class CoordinatorAgent:
             response if no suitable agent is found.
         """
 
-        if not user_input or not isinstance(user_input, str):
-            return "unknown"
+        if not isinstance(user_input, str) or not user_input.strip():
+            return {
+                "status": "error",
+                "message": "Invalid user input."
+            }
 
         # Create a new variable for the cleaned input to avoid mutating parameters
         clean_input = user_input.strip().lower()
@@ -55,11 +60,7 @@ class CoordinatorAgent:
                     return self.research_agent.handle(user_input)
 
                 if agent_id == "memory_agent":
-                    return {
-                        "status": "success",
-                        "agent": "memory_agent",
-                        "message": f"Memory feature triggered for: {user_input}"
-                    }
+                    return self.memory_agent.handle(user_input)
 
         # fallback OUTSIDE loop (VERY IMPORTANT)
         return {
@@ -76,6 +77,7 @@ if __name__ == "__main__":
     print(agent.route_request("research AI agents"))    # Expected: research_agent
     print(agent.route_request("save my notes"))          # Expected: memory_agent
     print(agent.route_request("What is the weather today?"))   # Expected: unknown
+    print(agent.route_request(""))
+    print(agent.route_request("     "))
 
-    
     
