@@ -3,8 +3,8 @@
 This module contains the CoordinatorAgent class, which acts as the central router
 directing user prompts to the correct specialized sub-agent.
 """
-
-from study_planner import create_study_plan
+from agents.research_agent import ResearchAgent
+from agents.study_planner import create_study_plan
 
 
 class CoordinatorAgent:
@@ -16,10 +16,10 @@ class CoordinatorAgent:
         "memory_agent": ["save", "remember"],
     }
 
-
     def __init__(self) -> None:
         """Initializes the Coordinator Agent with its name."""
         self.name: str = "Coordinator Agent"
+        self.research_agent = ResearchAgent()
 
     def route_request(self, user_input: str) -> str:
         """Routes the user's input to the correct specialized agent.
@@ -39,16 +39,30 @@ class CoordinatorAgent:
             return "unknown"
 
         # Create a new variable for the cleaned input to avoid mutating parameters
-        clean_input = user_input.lower()
+        clean_input = user_input.strip().lower()
 
         # Check keywords for each agent
         for agent_id, keywords in self.ROUTING_RULES.items():
             if any(keyword in clean_input for keyword in keywords):
+
                 if agent_id == "study_planner":
                     return create_study_plan(user_input)
 
-                return agent_id
-        return "unknown"
+                if agent_id == "research_agent":
+                    return self.research_agent.process(user_input)
+
+                if agent_id == "memory_agent":
+                    return {
+                        "status": "success",
+                        "agent": "memory_agent",
+                        "message": f"Memory feature triggered for: {user_input}"
+                    }
+
+        # fallback OUTSIDE loop (VERY IMPORTANT)
+        return {
+            "status": "error",
+            "message": "No suitable agent found"
+        }
 
 if __name__ == "__main__":
     # Instantiate the agent and demonstrate routing behavior

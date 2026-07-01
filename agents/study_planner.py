@@ -5,24 +5,29 @@ based on the user's academic tasks.
 """
 
 
-def create_study_plan(task: str) -> str:
+class StudyPlannerAgent:
     """
-    Create a study plan for the given task.
-
-    Args:
-        task: The academic task provided by the user.
-
-    Returns:
-        A formatted study plan as a string.
+    Generates study plans for academic tasks.
     """
+    
+    def handle(self, task: str) -> str:
+        """
+        Create a study plan for the given task.
 
-    if not task or not task.strip():
-        return "No task provided. Please specify a task to create a study plan."
+        Args:
+            task: The academic task provided by the user.
 
-    study_plan = f"""📚 Study Plan
+        Returns:
+            A formatted study plan as a string.
+        """
+
+        if not isinstance(task, str) or not task.strip():
+            return "No task provided. Please specify a task to create a study plan."
+
+        study_plan = f"""📚 Study Plan
 
 Task:
-- {task}
+- {task.strip()}
 
 Suggested Steps:
 1. Understand the task requirements.
@@ -32,8 +37,9 @@ Suggested Steps:
 5. Review your work before submission.
 """
 
-    return study_plan
+        return study_plan
+
 
 if __name__ == "__main__":
-    task = "Complete AI Capstone Project"
-    print(create_study_plan(task))
+    agent = StudyPlannerAgent()
+    print(agent.handle("Complete AI Capstone Project"))
