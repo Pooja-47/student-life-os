@@ -6,7 +6,7 @@ class ResearchAgent:
     def __init__(self):
         self.name = "Research Agent"
 
-    def process(self, query: str):
+    def handle(self, query: str):
         """
         Main entry point for Research Agent.
         """

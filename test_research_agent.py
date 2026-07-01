@@ -13,5 +13,5 @@ test_queries = [
 for q in test_queries:
     print("\n======================")
     print("INPUT:", repr(q))
-    result = agent.process(q)
+    result = agent.handle(q)
     print("OUTPUT:", result)
